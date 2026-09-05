@@ -1,0 +1,46 @@
+{% extends 'agrotrace/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Gestión de Fundos Productores</h2>
+    <a href="{% url 'agrotrace:fundo_create' %}" class="btn btn-success">+ Nuevo Fundo</a>
+</div>
+
+<table class="table table-striped table-hover bg-white shadow-sm rounded">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nombre Fundo</th>
+            <th>DNI / RUC</th>
+            <th>Hectáreas</th>
+            <th>Apto Exportación</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for fundo in fundos %}
+        <tr>
+            <td>{{ fundo.id }}</td>
+            <td>{{ fundo.nombre_fundo }}</td>
+            <td>{{ fundo.propietario_dni_ruc }}</td>
+            <td>{{ fundo.hectareas }}</td>
+            <td>
+                {% if fundo.valido_exportacion %}
+                    <span class="badge bg-success">Sí</span>
+                {% else %}
+                    <span class="badge bg-secondary">No</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'agrotrace:fundo_update' fundo.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'agrotrace:fundo_delete' fundo.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center py-4 text-muted">No hay fundos productores registrados aún.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
