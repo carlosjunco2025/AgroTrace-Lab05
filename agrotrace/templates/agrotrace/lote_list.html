@@ -2,45 +2,43 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Gestión de Lotes Recepcionados</h2>
-    <a href="{% url 'agrotrace:lote_create' %}" class="btn btn-primary">+ Nuevo Lote</a>
+    <h1>Gestión de Lotes Recepcionados</h1>
+    <a href="{% url 'agrotrace:lote_create' %}" class="btn btn-success">+ Nuevo Lote</a>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-dark">
-                <tr>
-                    <th>Código Lote</th>
-                    <th>Fundo Origen</th>
-                    <th>Tn Brutas</th>
-                    <th>% Descarte</th>
-                    <th>Estado</th>
-                    <th>Fecha Ingreso</th>
-                    <th class="text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for lote in lotes %}
-                <tr>
-                    <td class="fw-bold">{{ lote.codigo_lote }}</td>
-                    <td>{{ lote.fundo.nombre_fundo }}</td>
-                    <td>{{ lote.toneladas_brutas }} Tn</td>
-                    <td>{{ lote.porcentaje_descarte }}%</td>
-                    <td><span class="badge bg-info text-dark">{{ lote.estado_evaluacion }}</span></td>
-                    <td>{{ lote.fecha_ingreso|date:"d/m/Y H:i" }}</td>
-                    <td class="text-center">
-                        <a href="{% url 'agrotrace:lote_update' lote.pk %}" class="btn btn-sm btn-warning me-1">Editar</a>
-                        <a href="{% url 'agrotrace:lote_delete' lote.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7" class="text-center text-muted py-4">No hay lotes recepcionados registrados.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+<table class="table table-striped table-hover bg-white shadow-sm rounded">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Código Lote</th>
+            <th>Fundo</th>
+            <th>Toneladas Brutas</th>
+            <th>% Descarte</th>
+            <th>Estado</th>
+            <th>Fecha Ingreso</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lote in lotes %}
+        <tr>
+            <td>{{ lote.id }}</td>
+            <td>{{ lote.codigo_lote }}</td>
+            <td>{{ lote.fundo.nombre_fundo }}</td>
+            <td>{{ lote.toneladas_brutas }}</td>
+            <td>{{ lote.porcentaje_descarte }}</td>
+            <td>{{ lote.estado_evaluacion }}</td>
+            <td>{{ lote.fecha_ingreso }}</td>
+            <td>
+                <a href="{% url 'agrotrace:lote_update' lote.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                <a href="{% url 'agrotrace:lote_delete' lote.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8" class="text-center py-4 text-muted">No hay lotes registrados</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

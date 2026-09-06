@@ -1,42 +1,19 @@
 {% extends 'agrotrace/base.html' %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">{{ title }}</h4>
+<div class="card shadow-sm col-md-6 mx-auto">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">{{ title }}</h4>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-flex justify-content-between mt-3">
+                <a href="{% url 'agrotrace:lote_list' %}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-success">Guardar</button>
             </div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label">Fundo Productor Origen:</label>
-                        {{ form.fundo }}
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Código de Lote:</label>
-                        {{ form.codigo_lote }}
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Toneladas Brutas:</label>
-                        {{ form.toneladas_brutas }}
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Porcentaje de Descarte (%):</label>
-                        {{ form.porcentaje_descarte }}
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Estado de Evaluación:</label>
-                        {{ form.estado_evaluacion }}
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <a href="{% url 'agrotrace:lote_list' %}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Guardar Registro</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        </form>
     </div>
 </div>
 {% endblock %}
