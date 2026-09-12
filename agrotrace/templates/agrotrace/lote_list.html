@@ -11,7 +11,9 @@
         <tr>
             <th>ID</th>
             <th>Código Lote</th>
-            <th>Fundo</th>
+            <th>Fundo (1:N)</th>
+            <th>Evaluación (1:1)</th>
+            <th>Certificaciones (N:M)</th>
             <th>Toneladas Brutas</th>
             <th>% Descarte</th>
             <th>Estado</th>
@@ -24,7 +26,32 @@
         <tr>
             <td>{{ lote.id }}</td>
             <td>{{ lote.codigo_lote }}</td>
+            
+            <!-- Acceso Directo (1:N) -->
             <td>{{ lote.fundo.nombre_fundo }}</td>
+
+            <!-- Acceso Directo Inverso (1:1 a EvaluacionCalidadLote) -->
+            <td>
+                {% if lote.evaluacioncalidadlote %}
+                    Brix: {{ lote.evaluacioncalidadlote.nivel_brix }}° | pH: {{ lote.evaluacioncalidadlote.ph }}
+                {% else %}
+                    <span class="text-muted">Sin evaluación</span>
+                {% endif %}
+            </td>
+
+            <!-- Recorrido N:M (Certificaciones vinculadas) -->
+            <td>
+                {% if lote.certificaciones.all %}
+                    <ul class="mb-0 ps-3">
+                    {% for cert in lote.certificaciones.all %}
+                        <li>{{ cert.nombre_certificacion }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <span class="text-muted">Sin certificaciones</span>
+                {% endif %}
+            </td>
+
             <td>{{ lote.toneladas_brutas }}</td>
             <td>{{ lote.porcentaje_descarte }}</td>
             <td>{{ lote.estado_evaluacion }}</td>
@@ -36,7 +63,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="8" class="text-center py-4 text-muted">No hay lotes registrados</td>
+            <td colspan="10" class="text-center py-4 text-muted">No hay lotes registrados</td>
         </tr>
         {% endfor %}
     </tbody>

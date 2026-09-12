@@ -37,7 +37,15 @@ def fundo_delete(request, pk):
 
 # Vistas de LoteRecepcionado
 def lote_list(request):
-    lotes = LoteRecepcionado.objects.all()
+    # Ejercicio 6: Optimización de consultas ORM
+    # select_related para relaciones 1:1 y 1:N (JOIN en SQL)
+    # prefetch_related para relaciones N:M (consulta separada + join en memoria)
+    lotes = LoteRecepcionado.objects.select_related(
+        'fundo', 
+        'evaluacion_calidad'
+    ).prefetch_related(
+        'certificaciones'
+    )
     return render(request, 'agrotrace/lote_list.html', {'lotes': lotes})
 
 def lote_create(request):
