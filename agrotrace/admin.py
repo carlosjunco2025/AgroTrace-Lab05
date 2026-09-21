@@ -6,15 +6,26 @@ from .models import (
     FundoProductor, 
     LoteRecepcionado,
     EvaluacionCalidadLote,
-    CertificacionLote  # Importado en Ejercicio 7
+    CertificacionLote
 )
 
 # ==============================================================================
-# EJERCICIO 3 — Registrar modelos básicos
+# EJERCICIO 9 — Registrar las 7 entidades
 # ==============================================================================
+
+# Registro simple
 admin.site.register(CentroAcopio)
 admin.site.register(VariedadCultivo)
-admin.site.register(CertificacionAgricola)
+
+# Registro con ModelAdmin (tercer modelo personalizado, además de Fundo y Lote)
+@admin.register(CertificacionAgricola)
+class CertificacionAgricolaAdmin(admin.ModelAdmin):
+    list_display = ('nombre_certificacion', 'entidad_emisora')
+    search_fields = ('nombre_certificacion',)
+
+# Entidades de las relaciones, registradas también de forma independiente
+admin.site.register(EvaluacionCalidadLote)
+admin.site.register(CertificacionLote)
 
 
 # ==============================================================================
@@ -38,8 +49,8 @@ class CertificacionLoteInline(admin.TabularInline):
 # ==============================================================================
 @admin.register(FundoProductor)
 class FundoProductorAdmin(admin.ModelAdmin):
-    list_display = ('nombre_fundo', 'propietario_dni_ruc', 'hectareas')  # Ejercicio 4
-    search_fields = ('nombre_fundo', 'propietario_dni_ruc')               # Ejercicio 4
+    list_display = ('nombre_fundo', 'propietario_dni_ruc', 'hectareas')
+    search_fields = ('nombre_fundo', 'propietario_dni_ruc')
 
 
 # ==============================================================================
@@ -47,14 +58,7 @@ class FundoProductorAdmin(admin.ModelAdmin):
 # ==============================================================================
 @admin.register(LoteRecepcionado)
 class LoteRecepcionadoAdmin(admin.ModelAdmin):
-    # Ejercicio 4: Columnas personalizadas
     list_display = ('codigo_lote', 'fundo', 'toneladas_brutas', 'fecha_ingreso')
-    
-    # Ejercicio 4: Barra de búsqueda
     search_fields = ('codigo_lote', 'fundo__nombre_fundo')
-    
-    # Ejercicio 5: Panel lateral de filtros
     list_filter = ('fecha_ingreso', 'fundo')
-    
-    # Ejercicios 6 y 7: Formularios integrados (1:1 en bloque y N:M en tabla)
     inlines = [EvaluacionCalidadInline, CertificacionLoteInline]
