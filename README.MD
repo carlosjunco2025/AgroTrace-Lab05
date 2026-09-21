@@ -1,70 +1,30 @@
-# AgroTrace
+## Django Admin (Laboratorio 5)
 
-Sistema web para la gestión de acopio y trazabilidad de materia prima agrícola, desarrollado con Django, Django ORM y SQLite como parte del laboratorio GLAB-S03 (Desarrollo de Aplicaciones Empresariales).
+Se registraron las 7 entidades del modelo de datos en el panel de administración de Django (`/admin/`):
 
-## Problemática
+- Registro simple: `CentroAcopio`, `VariedadCultivo`
+- Registro con `ModelAdmin` personalizado: `CertificacionAgricola`, `FundoProductor`, `LoteRecepcionado`
+- Registro simple (entidades de relaciones): `EvaluacionCalidadLote`, `CertificacionLote`
 
-En el sector agroexportador peruano, específicamente en la cadena de suministro de productos como la palta y el mango, muchas empresas procesadoras adquieren materia prima de diversos fundos y pequeños productores rurales utilizando registros físicos o planillas desarticuladas. Esta falta de centralización dificulta garantizar el origen exacto de los productos exigido por los mercados internacionales, genera demoras al evaluar los porcentajes de descarte por calidad y complica la liquidación de pagos a los agricultores.
+### Personalización de ModelAdmin
 
-**AgroTrace** digitaliza la recepción de cosechas y el control de calidad desde el campo hasta el almacén, permitiendo:
+- `FundoProductorAdmin`: `list_display` (nombre, DNI/RUC, hectáreas) y `search_fields`.
+- `LoteRecepcionadoAdmin`: `list_display` (código, fundo, toneladas, fecha), `search_fields` (incluyendo búsqueda a través de la FK con `fundo__nombre_fundo`) y `list_filter` (por fecha de ingreso y por fundo).
+- `CertificacionAgricolaAdmin`: `list_display` y `search_fields`.
 
-- Registrar los fundos productores de origen y su condición para exportación.
-- Registrar cada lote de materia prima recibido, vinculado obligatoriamente a su fundo de origen.
-- Consultar, actualizar y eliminar esta información de manera centralizada y persistente.
+### Inlines
 
-## Usuarios involucrados
+- `EvaluacionCalidadInline` (`StackedInline`): expone la relación 1:1 con `EvaluacionCalidadLote` dentro del formulario de `LoteRecepcionado`.
+- `CertificacionLoteInline` (`TabularInline`): expone el modelo intermedio `CertificacionLote` de la relación N:M dentro del mismo formulario, mostrando `fecha_auditoria` y `codigo_inspeccion` como columnas editables.
 
-- **Auditor de calidad / Ingeniero de campo:** inspecciona los predios y verifica las certificaciones agrícolas.
-- **Jefe de centro de acopio:** realiza el pesaje en balanza, el registro de lotes y la evaluación de merma.
-- **Administrador de la agroexportadora:** supervisa el volumen consolidado, aprueba el estado de cada lote y gestiona las liquidaciones comerciales.
-
-## Requisitos funcionales principales
-
-- RF-01 / RF-02: Registrar y listar centros de acopio.
-- RF-03 / RF-04: Registrar variedades de cultivo y consultar certificaciones agrícolas.
-- RF-05 / RF-06: Registrar y listar fundos productores, filtrando por condición de exportación.
-- RF-07 / RF-08: Actualizar y eliminar fundos productores.
-- RF-09 / RF-10: Registrar y listar lotes recepcionados, vinculados a su fundo de origen.
-- RF-11 / RF-12: Actualizar el estado de evaluación de un lote y eliminar registros duplicados o erróneos.
-
-## Modelo de datos
-
-El sistema define 5 entidades:
-
-**Entidades independientes**
-- `CentroAcopio`
-- `VariedadCultivo`
-- `CertificacionAgricola`
-
-**Entidades relacionadas (ForeignKey)**
-- `FundoProductor` (padre)
-- `LoteRecepcionado` (hija, vinculada a `FundoProductor` mediante `fundo_id`)
-
-Un fundo agrícola puede entregar múltiples lotes de materia prima a lo largo de una campaña (relación 1:N), garantizando la trazabilidad completa desde la planta hasta el predio de origen.
-
-## Tecnologías utilizadas
-
-- Python 3.10+
-- Django 5
-- Django ORM
-- SQLite
-- Bootstrap 5 (interfaz web)
-
-## Funcionalidades implementadas
-
-CRUD completo (Crear, Leer, Actualizar, Eliminar) mediante Django ORM para:
-
-- **Fundos Productores** (`/agrotrace/fundos/`)
-- **Lotes Recepcionados** (`/agrotrace/lotes/`)
-
-Cada operación reemplaza el manejo de datos en memoria por persistencia real en SQLite, utilizando `Model.objects.all()`, `.create()`, `.get_object_or_404()` y `.delete()` según corresponda.
+Con esto, el flujo completo de creación, edición y eliminación de un lote y sus relaciones puede gestionarse desde una sola pantalla del Admin, sin necesidad de Views ni Templates propios para uso interno/staff.
 
 ## Instalación y ejecución
 
 ```bash
 # Clonar el repositorio
 git clone <url-del-repositorio>
-cd lab03-agrotrace-project
+cd AgroTrace-Lab05
 
 # Crear y activar entorno virtual
 python -m venv venv
@@ -75,10 +35,9 @@ source venv/bin/activate   # Linux/Mac
 pip install -r requirements.txt
 
 # Aplicar migraciones
-python manage.py makemigrations
 python manage.py migrate
 
-# Crear superusuario (opcional, para acceder al admin)
+# Crear superusuario para acceder al panel de administración
 python manage.py createsuperuser
 
 # Levantar el servidor de desarrollo
@@ -88,9 +47,5 @@ python manage.py runserver
 Luego abrir en el navegador:
 - `http://127.0.0.1:8000/agrotrace/fundos/`
 - `http://127.0.0.1:8000/agrotrace/lotes/`
-- `http://127.0.0.1:8000/admin/` (panel de administración)
-
-## Autor
-
-- Carlos Fernando, Junco Santiago (C24 - D IV)
-- Gael Matteo, La Jara Barboza (C24 - D IV)
+- `http://127.0.0.1:8000/agrotrace/certificaciones-lote/`
+- `http://127.0.0.1:8000/admin/` (panel de administración — gestión completa de las 7 entidades con relaciones integradas mediante Inlines)
