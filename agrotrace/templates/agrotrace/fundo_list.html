@@ -1,19 +1,17 @@
 {% extends 'agrotrace/base.html' %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Gestión de Fundos Productores</h2>
-    <a href="{% url 'agrotrace:fundo_create' %}" class="btn btn-success">+ Nuevo Fundo</a>
-</div>
+{# Comentario: Lista de fundos refactorizada con herencia, include y filtros de formato #}
+
+{% include 'agrotrace/header.html' with titulo="Gestión de Fundos Agropecuarios" url_crear="agrotrace:fundo_create" %}
 
 <table class="table table-striped table-hover bg-white shadow-sm rounded">
     <thead class="table-dark">
         <tr>
             <th>ID</th>
-            <th>Nombre Fundo</th>
-            <th>DNI / RUC</th>
-            <th>Hectáreas</th>
-            <th>Apto Exportación</th>
+            <th>Nombre del Fundo</th>
+            <th>Ubicación / Región</th>
+            <th>Hectáreas Totales</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -21,16 +19,9 @@
         {% for fundo in fundos %}
         <tr>
             <td>{{ fundo.id }}</td>
-            <td>{{ fundo.nombre_fundo }}</td>
-            <td>{{ fundo.propietario_dni_ruc }}</td>
-            <td>{{ fundo.hectareas }}</td>
-            <td>
-                {% if fundo.valido_exportacion %}
-                    <span class="badge bg-success">Sí</span>
-                {% else %}
-                    <span class="badge bg-secondary">No</span>
-                {% endif %}
-            </td>
+            <td>{{ fundo.nombre|upper }}</td>
+            <td>{{ fundo.ubicacion|default:"No especificada" }}</td>
+            <td>{{ fundo.hectareas|floatformat:1 }} ha</td>
             <td>
                 <a href="{% url 'agrotrace:fundo_update' fundo.pk %}" class="btn btn-sm btn-warning">Editar</a>
                 <a href="{% url 'agrotrace:fundo_delete' fundo.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
@@ -38,7 +29,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="6" class="text-center py-4 text-muted">No hay fundos productores registrados aún.</td>
+            <td colspan="5" class="text-center text-muted">No hay fundos registrados en el sistema.</td>
         </tr>
         {% endfor %}
     </tbody>
