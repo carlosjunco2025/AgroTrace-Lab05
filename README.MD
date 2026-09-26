@@ -1,34 +1,34 @@
-## Django Admin (Laboratorio 5)
+## Refactorización de Templates, Modularidad y Seguridad (Laboratorio 6)
 
-Se registraron las 7 entidades del modelo de datos en el panel de administración de Django (`/admin/`):
+Se refactorizó la capa de presentación (Templates) para todas las entidades del proyecto `AgroTrace`, aplicando herencia de plantillas, componentes modulares reusables, filtros de formato nativos y verificación de seguridad contra vulnerabilidades XSS.
 
-- Registro simple: `CentroAcopio`, `VariedadCultivo`
-- Registro con `ModelAdmin` personalizado: `CertificacionAgricola`, `FundoProductor`, `LoteRecepcionado`
-- Registro simple (entidades de relaciones): `EvaluacionCalidadLote`, `CertificacionLote`
+- **Herencia de Plantillas (`base.html`)**: Migración de las plantillas de `FundoProductor`, `LoteRecepcionado` y entidades de la investigación propia para extender de un layout maestro unificado mediante `{% extends %}` y `{% block content %}`.
+- **Modularización (`{% include %}`)**: Extracción de componentes visuales repetidos hacia plantillas independientes, incluyendo la cabecera dinámica global (`header.html`) y tarjetas de presentación para relaciones intermedias N:M (`relacion_card.html`).
+- **Filtros de Formato (Template Filters)**: Aplicación de filtros nativos como `|upper` para texto en mayúsculas, `|date:"d/m/Y"` para formato de fechas, `|floatformat` para precisión en toneladas/hectáreas y `|default` para atributos no especificados.
 
-### Personalización de ModelAdmin
+### Seguridad y Verificación (Auto-Escape XSS)
 
-- `FundoProductorAdmin`: `list_display` (nombre, DNI/RUC, hectáreas) y `search_fields`.
-- `LoteRecepcionadoAdmin`: `list_display` (código, fundo, toneladas, fecha), `search_fields` (incluyendo búsqueda a través de la FK con `fundo__nombre_fundo`) y `list_filter` (por fecha de ingreso y por fundo).
-- `CertificacionAgricolaAdmin`: `list_display` y `search_fields`.
+- **Sanitización Nativa**: Se probó la inyección de vectores de script (`<script>alert("XSS Test")</script>`) en los formularios de creación de datos (`LoteRecepcionado`).
+- **Confirmación en el DOM**: Se verificó a través del inspector de elementos (**F12**) que el motor de plantillas de Django transforma automáticamente los caracteres `<` y `>` en entidades HTML seguras (`&lt;` y `&gt;`), previniendo ataques de Cross-Site Scripting sin requerir bibliotecas externas.
 
-### Inlines
+### Refactorización por Entidades
 
-- `EvaluacionCalidadInline` (`StackedInline`): expone la relación 1:1 con `EvaluacionCalidadLote` dentro del formulario de `LoteRecepcionado`.
-- `CertificacionLoteInline` (`TabularInline`): expone el modelo intermedio `CertificacionLote` de la relación N:M dentro del mismo formulario, mostrando `fecha_auditoria` y `codigo_inspeccion` como columnas editables.
+- `FundoProductor`: Renderizado dinámico con tabla estilizada Bootstrap 5, acciones rápidas de edición/eliminación y formateo de hectáreas.
+- `LoteRecepcionado`: Despliegue de relaciones 1:N (`Fundo`), 1:1 (`EvaluacionCalidad`) y N:M (`Certificaciones`) con filtros de formato en toneladas y porcentajes de descarte.
+- `CertificacionAgricola` / `EvaluacionCalidadLote`: Integración de tarjetas modulares `relacion_card.html` para presentación clara de registros.
 
-Con esto, el flujo completo de creación, edición y eliminación de un lote y sus relaciones puede gestionarse desde una sola pantalla del Admin, sin necesidad de Views ni Templates propios para uso interno/staff.
+Con esto, el sistema AgroTrace cuenta con una interfaz de usuario final completamente funcional, mantenible y segura, complementando la gestión interna realizada previamente en el Django Admin.
 
 ## Instalación y ejecución
 
 ```bash
 # Clonar el repositorio
-git clone <url-del-repositorio>
-cd AgroTrace-Lab05
+git clone [https://github.com/carlosjunco2025/agrotrace.git](https://github.com/carlosjunco2025/agrotrace.git)
+cd agrotrace
 
 # Crear y activar entorno virtual
 python -m venv venv
-venv\Scripts\activate      # Windows
+venv\Scripts\activate       # Windows
 source venv/bin/activate   # Linux/Mac
 
 # Instalar dependencias
@@ -42,10 +42,14 @@ python manage.py createsuperuser
 
 # Levantar el servidor de desarrollo
 python manage.py runserver
-```
 
 Luego abrir en el navegador:
-- `http://127.0.0.1:8000/agrotrace/fundos/`
-- `http://127.0.0.1:8000/agrotrace/lotes/`
-- `http://127.0.0.1:8000/agrotrace/certificaciones-lote/`
-- `http://127.0.0.1:8000/admin/` (panel de administración — gestión completa de las 7 entidades con relaciones integradas mediante Inlines)
+
+http://127.0.0.1:8000/agrotrace/fundos/ (gestión refactorizada de fundos)
+
+http://127.0.0.1:8000/agrotrace/lotes/ (gestión refactorizada de lotes)
+
+http://127.0.0.1:8000/admin/ (panel de administración de Django)
+
+
+---
